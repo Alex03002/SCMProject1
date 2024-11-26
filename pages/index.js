@@ -58,18 +58,49 @@ export default function HomePage() {
       setBalance((await atm.getBalance()).toNumber());
     }
   }
-
+ 
   const deposit = async() => {
     if (atm) {
-      let tx = await atm.deposit(1);
-      await tx.wait()
+      // Ask the user for an amount to deposit
+      let amount = parseFloat(prompt("Enter the amount you wish to deposit:"));
+      
+      // Check if the input is a valid number
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid positive number.");
+        return;
+      }
+      
+      let tx = await atm.deposit(amount);
+      await tx.wait();
       getBalance();
     }
   }
 
   const withdraw = async() => {
     if (atm) {
-      let tx = await atm.withdraw(1);
+      // Ask the user for an amount to withdraw
+      let amount = parseFloat(prompt("Enter the amount you wish to withdraw:"));
+      
+      // Check if the input is a valid number
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid positive number.");
+        return;
+      }
+      else if (amount > balance) {
+        alert("You cannot withdraw an amount larger than your current balance.");
+        return;
+      }
+      
+      let tx = await atm.withdraw(amount);
+      await tx.wait();
+      getBalance();
+    }
+  }
+
+  const withdrawall = async() => {
+    if (atm) {
+      getBalance()
+      let tx = await atm.withdraw(balance);
       await tx.wait()
       getBalance();
     }
@@ -94,8 +125,9 @@ export default function HomePage() {
       <div>
         <p>Your Account: {account}</p>
         <p>Your Balance: {balance}</p>
-        <button onClick={deposit}>Deposit 1 ETH</button>
-        <button onClick={withdraw}>Withdraw 1 ETH</button>
+        <button onClick={deposit}>Deposit ETH</button>
+        <button onClick={withdraw}>Withdraw ETH</button>
+        <button onClick={withdrawall}>Withdraw all ETH</button>
       </div>
     )
   }
@@ -105,10 +137,18 @@ export default function HomePage() {
   return (
     <main className="container">
       <header><h1>Welcome to the Metacrafters ATM!</h1></header>
+      <header><h2>v0.2</h2></header>
       {initUser()}
       <style jsx>{`
         .container {
-          text-align: center
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100vh; /* This makes the container take up the full viewport height */
+          text-align: center;
+          background-color: #0E1117;
+          color: #FFFFFF;
         }
       `}
       </style>
