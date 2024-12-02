@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-//import "hardhat/console.sol";
-
 contract Assessment {
     address payable public owner;
     uint256 public balance;
 
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     constructor(uint initBalance) payable {
         owner = payable(msg.sender);
@@ -56,5 +55,12 @@ contract Assessment {
 
         // emit the event
         emit Withdraw(_withdrawAmount);
+    }
+
+    function transferOwnership(address payable newOwner) public {
+        require(msg.sender == owner, "You are not the owner of this account");
+        require(newOwner != address(0), "New owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
     }
 }
